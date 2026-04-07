@@ -1,11 +1,13 @@
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-  chrome.scripting.executeScript({
-    target: { tabId: tabs[0].id },
-    function: auditLinks
-  });
-});
+document.getElementById("analyzeBtn").addEventListener("click", async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-function auditLinks() {
-  const links = Array.from(document.querySelectorAll("a"));
-  return links.length;
-}
+  const results = await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: () => {
+      const links = Array.from(document.querySelectorAll("a"));
+      return links.length;
+    }
+  });
+
+  document.getElementById("totalLinks").innerText = results[0].result;
+});
